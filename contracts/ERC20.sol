@@ -1,6 +1,6 @@
 // SPDX-License-Identifier:MIT
 
-pragma solidity 0.8.11;
+pragma solidity 0.8.12;
 
 contract ERC20{
     uint256 public totalSupply;
@@ -10,7 +10,7 @@ contract ERC20{
 
     event Transfer(address indexed from , address indexed to, uint256 value);
     event Approval(address indexed owner,address indexed spender, uint256 value);
-  
+    event Deposit(address indexed from,address indexed to , uint value256);
 
 
     mapping(address =>uint256) public balanceOf;
@@ -23,7 +23,7 @@ contract ERC20{
         name= _name;
         symbol= _symbol;
 
-        _mint(msg.sender,100e18);
+        // _mint(msg.sender,msg.value);
     }
 
     function decimals() external pure returns(uint8){
@@ -50,7 +50,7 @@ contract ERC20{
 
 
     function approve(address spender,uint256 amount) external returns (bool){
-        require(spender!= address(0),"ERC:apporove to the zero address");
+        require(spender!= address(0),"ERC20:apporove to the zero address");
 
         allowance[msg.sender][spender] = amount;
 
@@ -58,6 +58,17 @@ contract ERC20{
 
         return true;
     }
+
+
+     function deposit(address recipient , uint256 amount) external returns (bool){
+            balanceOf[recipient] +=amount;
+
+            emit Deposit(address(0),recipient,amount);
+
+            return true;
+            //needs to be checked
+
+     }
 
     function _transfer(address sender,address recipient ,uint256 amount) private returns (bool){
         require (recipient != address(0),"ERC20: transfer from zero address");
@@ -75,6 +86,8 @@ contract ERC20{
     }
 
 
+
+
     function _mint(address to ,uint256 amount) internal {
         require(to !=address(0),"ERC20 :mint to zero address");
     
@@ -82,6 +95,17 @@ contract ERC20{
     balanceOf[to] +=amount;
 
     emit Transfer(address(0), to, amount);
+
+    }
+
+
+    function _burn(address from ,uint256 amount) internal {
+        require(from !=address(0),"ERC20 :burn from  the zero address");
+    
+    totalSupply -=amount;
+    balanceOf[from]  -=amount;
+
+    emit Transfer(from,address(0), amount);
 
     }
 }
